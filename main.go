@@ -2,12 +2,16 @@ package main
 
 import (
 	"database/sql"
+
+	"github.com/Prateek462003/trello-backend/controllers"
+	"github.com/Prateek462003/trello-backend/database"
+	"github.com/gin-gonic/gin"
+
+	// "github.com/joho/godotenv"
 	"log"
 	"net/http"
 	"os"
 
-	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
@@ -74,30 +78,31 @@ func deleteTask(c *gin.Context) {
 }
 
 func main() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal(err)
-	}
+	// err := godotenv.Load(".env")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	db, err = sql.Open("postgres", os.Getenv("URI"))
-	if err != nil {
-		log.Fatal(err)
-	}
+	// db, err = sql.Open("postgres", os.Getenv("URI"))
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	err = db.Ping()
-	if err != nil {
-		log.Fatal(err)
-	}
+	// err = db.Ping()
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
+	database.Init()
 	router := gin.Default()
 
-	router.GET("/tasks", getTasks)
-	router.POST("/tasks", createTask)
-	router.DELETE("/tasks/:id", deleteTask)
+	router.GET("/tasks", controllers.GetTasks)
+	router.POST("/tasks", controllers.CreateTask)
+	router.DELETE("/tasks/:id", controllers.DeleteTask)
 
 	port := os.Getenv("PORT")
 	if port == " " {
 		port = "8080"
 	}
-	router.Run(":" + port)
+	router.Run("localhost:" + port)
 }
