@@ -29,7 +29,7 @@ type Activity struct {
 
 func getTasks(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
-	rows, err := db.Query("SELECT id, title, description FROM tasks")
+	rows, err := db.Query("SELECT id, title, description, image FROM tasks")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -38,7 +38,7 @@ func getTasks(c *gin.Context) {
 	var tasks []Task
 	for rows.Next() {
 		var task Task
-		if err := rows.Scan(&task.ID, &task.Title, &task.Description); err != nil {
+		if err := rows.Scan(&task.ID, &task.Title, &task.Description, &task.Image); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
@@ -168,5 +168,5 @@ func main() {
 	if port == " " {
 		port = "8080"
 	}
-	router.Run("localhost:" + port)
+	router.Run(":" + port)
 }
