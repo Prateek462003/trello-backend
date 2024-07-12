@@ -1,15 +1,15 @@
 package main
 
 import (
-	"database/sql"
+	// "database/sql"
 
 	"github.com/Prateek462003/trello-backend/controllers"
 	"github.com/Prateek462003/trello-backend/database"
 	"github.com/gin-gonic/gin"
 
 	// "github.com/joho/godotenv"
-	"log"
-	"net/http"
+	// "log"
+	// "net/http"
 	"os"
 
 	_ "github.com/lib/pq"
