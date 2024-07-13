@@ -55,7 +55,8 @@ func createTask(c *gin.Context) {
 		return
 	}
 
-	_, err := db.Exec("INSERT INTO tasks (title, description, image, activity_id) VALUES ($1, $2, $3, $4)", task.Title, task.Description, task.Image, task.ActivityId)
+	query := "INSERT INTO tasks (title, description, image, activity_id) VALUES ($1, $2, $3, $4)"
+	_, err := db.Exec(query, task.Title, task.Description, sql.NullString{String: task.Image, Valid: task.Image != ""}, task.ActivityId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
