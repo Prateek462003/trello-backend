@@ -2,9 +2,9 @@ package main
 
 import (
 	"database/sql"
-	"github.com/gin-gonic/gin"
-
+	"encoding/json"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"log"
 	"net/http"
@@ -16,11 +16,27 @@ import (
 var db *sql.DB
 
 type Task struct {
-	ID          int    `json:"id"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Image       string `json:"image"`
-	ActivityId  int    `json:"activity_id"`
+	ID          int            `json:"id"`
+	Title       string         `json:"title"`
+	Description string         `json:"description"`
+	Image       sql.NullString `json:"image"`
+	ActivityId  int            `json:"activity_id"`
+}
+
+func (t Task) MarshalJSON() ([]byte, error) {
+	type Alias Task
+	return json.Marshal(&struct {
+		Image *string `json:"image,omitempty"`
+		Alias
+	}{
+		Image: func() *string {
+			if t.Image.Valid {
+				return &t.Image.String
+			}
+			return nil
+		}(),
+		Alias: (Alias)(t),
+	})
 }
 
 type Activity struct {
@@ -55,8 +71,8 @@ func createTask(c *gin.Context) {
 		return
 	}
 
-	query := "INSERT INTO tasks (title, description, image, activity_id) VALUES ($1, $2, $3, $4)"
-	_, err := db.Exec(query, task.Title, task.Description, sql.NullString{String: task.Image, Valid: task.Image != ""}, task.ActivityId)
+	_, err := db.Exec("INSERT INTO tasks (title, description, image, activity_id) VALUES ($1, $2, $3, $4)",
+		task.Title, task.Description, task.Image, task.ActivityId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -177,5 +193,5 @@ func main() {
 	if port == " " {
 		port = "8080"
 	}
-	router.Run(":" + port)
+	router.Run("localhost:" + port)
 }
