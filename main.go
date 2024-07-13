@@ -44,6 +44,7 @@ type Activity struct {
 	Name string `json:"name"`
 }
 
+// All the Task Controllers and Activity Controllers are inside the ./controllers folder due to hosting problem all reside in a single file
 func getTasks(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
 	rows, err := db.Query("SELECT id, title, description, image FROM tasks")
@@ -193,5 +194,5 @@ func main() {
 	if port == " " {
 		port = "8080"
 	}
-	router.Run(":" + port)
+	router.Run("localhost:" + port)
 }
