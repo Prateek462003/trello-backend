@@ -65,6 +65,28 @@ func getTasks(c *gin.Context) {
 	c.JSON(http.StatusOK, tasks)
 }
 
+func (t *Task) UnmarshalJSON(data []byte) error {
+	type Alias Task
+	aux := &struct {
+		Image *string `json:"image,omitempty"`
+		*Alias
+	}{
+		Alias: (*Alias)(t),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	if aux.Image != nil {
+		t.Image = sql.NullString{String: *aux.Image, Valid: true}
+	} else {
+		t.Image = sql.NullString{String: "", Valid: false}
+	}
+
+	return nil
+}
+
 func createTask(c *gin.Context) {
 	var task Task
 	if err := c.BindJSON(&task); err != nil {
