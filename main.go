@@ -47,7 +47,7 @@ type Activity struct {
 // All the Task Controllers and Activity Controllers are inside the ./controllers folder due to hosting problem all reside in a single file
 func getTasks(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
-	rows, err := db.Query("SELECT id, title, description, image FROM tasks")
+	rows, err := db.Query("SELECT id, title, description, image, activity_id FROM tasks")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -56,7 +56,7 @@ func getTasks(c *gin.Context) {
 	var tasks []Task
 	for rows.Next() {
 		var task Task
-		if err := rows.Scan(&task.ID, &task.Title, &task.Description, &task.Image); err != nil {
+		if err := rows.Scan(&task.ID, &task.Title, &task.Description, &task.Image, &task.ActivityId); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
@@ -213,7 +213,7 @@ func main() {
 	router.DELETE("/tasks/:id", deleteTask)
 
 	port := os.Getenv("PORT")
-	if port == " " {
+	if port == "" {
 		port = "8080"
 	}
 	router.Run(":" + port)
