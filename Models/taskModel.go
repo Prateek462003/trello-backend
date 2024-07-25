@@ -28,3 +28,25 @@ func (t Task) MarshalJSON() ([]byte, error) {
 		Alias: (Alias)(t),
 	})
 }
+
+func (t *Task) UnmarshalJSON(data []byte) error {
+	type Alias Task
+	aux := &struct {
+		Image *string `json:"image,omitempty"`
+		*Alias
+	}{
+		Alias: (*Alias)(t),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	if aux.Image != nil {
+		t.Image = sql.NullString{String: *aux.Image, Valid: true}
+	} else {
+		t.Image = sql.NullString{String: "", Valid: false}
+	}
+
+	return nil
+}
